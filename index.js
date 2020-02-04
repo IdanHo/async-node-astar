@@ -1,6 +1,5 @@
 const assert = require('assert');
 const Heap = require('heap-js');
-const Observable = require('rxjs').Observable;
 
 module.exports = {};
 module.exports.syncAStar = aStar;
@@ -119,37 +118,33 @@ function AsyncAStar(params) {
     openDataMap.set(hash(startNode.data), startNode);
     const startTime = new Date();
 
-    return new Observable(function (resolve) {
+    return new Promise(resolve => {
         function pop() {
             if (openHeap.size() === 0) {
-                resolve.next({
+                return resolve({
                     status: "noPath",
                     cost: bestNode.g,
                     path: reconstructPath(bestNode),
                 });
-                return resolve.complete();
             }
 
             if (new Date() - startTime > params.timeout) {
                 console.log("timeout");
-                resolve.next({
+                return resolve({
                     status: 'timeout',
                     cost: bestNode.g,
                     path: reconstructPath(bestNode),
                 });
-                return resolve.complete();
-
             }
             let node = openHeap.pop();
             openDataMap.delete(hash(node.data));
             if (params.isEnd(node.data)) {
                 // done
-                resolve.next({
+                return resolve({
                     status: 'success',
                     cost: node.g,
                     path: reconstructPath(node),
                 });
-                return resolve.complete();
             }
             // not done yet
             closedDataSet.add(hash(node.data));
@@ -186,10 +181,9 @@ function AsyncAStar(params) {
                 if (neighborNode.h < bestNode.h) bestNode = neighborNode;
                 if (!update) openHeap.push(neighborNode);
             }
-            process.nextTick(() => pop());
+            process.nextTick(pop);
         }
-
-        process.nextTick(() => pop());
+        process.nextTick(pop);
     });
 
 }

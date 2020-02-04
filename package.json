@@ -1,6 +1,6 @@
 {
   "name": "async-a-star",
-  "version": "0.3.2",
+  "version": "1.0.0",
   "description": "Generic (a) synchronous A* search algorithm",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,6 @@
   "author": "IdanHo",
   "license": "BSD",
   "dependencies": {
-    "heap-js": "^1.4.1",
-    "rxjs": "^6.5.4"
+    "heap-js": "^1.4.1"
   }
 }
