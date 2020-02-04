@@ -10,6 +10,6 @@
   "author": "IdanHo",
   "license": "BSD",
   "dependencies": {
-    "heap-js": "^1.4.1"
+    "qheap": "^1.4.0"
   }
 }

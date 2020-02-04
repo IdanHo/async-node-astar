@@ -1,5 +1,5 @@
 const assert = require('assert');
-const { Heap } = require('heap-js');
+const Heap = require('qheap');
 
 module.exports = {};
 module.exports.syncAStar = aStar;
@@ -24,12 +24,12 @@ function aStar(params) {
     startNode.f = startNode.h;
     // leave .parent undefined
     const closedDataSet = new Set();
-    const openHeap = new Heap(heapComparator);
+    const openHeap = new Heap({compar: heapComparator});
     const openDataMap = new Map();
     openHeap.push(startNode);
     openDataMap.set(hash(startNode.data), startNode);
     const startTime = new Date();
-    while (openHeap.size()) {
+    while (openHeap.length) {
         if (new Date() - startTime > params.timeout) {
             return {
                 status: 'timeout',
@@ -37,7 +37,7 @@ function aStar(params) {
                 path: reconstructPath(bestNode),
             };
         }
-        let node = openHeap.pop();
+        let node = openHeap.remove();
         openDataMap.delete(hash(node.data));
         if (params.isEnd(node.data)) {
             // done
@@ -112,7 +112,7 @@ function AsyncAStar(params) {
     startNode.f = startNode.h;
     // leave .parent undefined
     const closedDataSet = new Set();
-    const openHeap = new Heap(heapComparator);
+    const openHeap = new Heap({compar: heapComparator});
     const openDataMap = new Map();
     openHeap.push(startNode);
     openDataMap.set(hash(startNode.data), startNode);
@@ -120,7 +120,7 @@ function AsyncAStar(params) {
 
     return new Promise(resolve => {
         function pop() {
-            if (openHeap.size() === 0) {
+            if (openHeap.length === 0) {
                 return resolve({
                     status: "noPath",
                     cost: bestNode.g,
@@ -136,7 +136,7 @@ function AsyncAStar(params) {
                     path: reconstructPath(bestNode),
                 });
             }
-            let node = openHeap.pop();
+            let node = openHeap.remove();
             openDataMap.delete(hash(node.data));
             if (params.isEnd(node.data)) {
                 // done
