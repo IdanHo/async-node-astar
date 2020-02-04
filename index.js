@@ -3,8 +3,8 @@ const Heap = require('heap-js');
 const Observable = require('rxjs').Observable;
 
 module.exports = {};
-module.exports.aStar = aStar;
-module.exports.AsyncAStar = AsyncAStar;
+module.exports.syncAStar = aStar;
+module.exports.asyncAStar = AsyncAStar;
 
 function aStar(params) {
     assert.ok(params.start !== undefined);
