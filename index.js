@@ -1,10 +1,10 @@
-var assert = require('assert')
-    , StringSet = require('Set')
-    , Heap = require('heap')
-    , dict = require('dict')
-    , Observable = require('rxjs').Observable
+const assert = require('assert');
+const StringSet = require('Set');
+const Heap = require('heap');
+const dict = require('dict');
+const Observable = require('rxjs').Observable;
 
-module.exports = aStar;
+module.exports = {};
 module.exports.aStar = aStar;
 module.exports.AsyncAStar = AsyncAStar;
 
@@ -98,9 +98,6 @@ function aStar(params) {
     };
 }
 
-/**
- * @return {Observable<any>}
- */
 function AsyncAStar(params) {
     assert.ok(params.start !== undefined);
     assert.ok(params.isEnd !== undefined);
