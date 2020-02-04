@@ -1,7 +1,5 @@
 const assert = require('assert');
-const StringSet = require('Set');
-const Heap = require('heap');
-const dict = require('dict');
+const Heap = require('heap-js');
 const Observable = require('rxjs').Observable;
 
 module.exports = {};
@@ -16,22 +14,22 @@ function aStar(params) {
     assert.ok(params.heuristic);
     if (params.timeout === undefined) params.timeout = Infinity;
     assert.ok(!isNaN(params.timeout));
-    var hash = params.hash || defaultHash;
+    const hash = params.hash || defaultHash;
 
-    var startNode = {
+    let startNode = {
         data: params.start,
         g: 0,
         h: params.heuristic(params.start),
     };
-    var bestNode = startNode;
+    let bestNode = startNode;
     startNode.f = startNode.h;
     // leave .parent undefined
-    var closedDataSet = new StringSet();
-    var openHeap = new Heap(heapComparator);
-    var openDataMap = dict();
+    const closedDataSet = new Set();
+    const openHeap = new Heap(heapComparator);
+    const openDataMap = new Map();
     openHeap.push(startNode);
     openDataMap.set(hash(startNode.data), startNode);
-    var startTime = new Date();
+    const startTime = new Date();
     while (openHeap.size()) {
         if (new Date() - startTime > params.timeout) {
             return {
@@ -40,7 +38,7 @@ function aStar(params) {
                 path: reconstructPath(bestNode),
             };
         }
-        var node = openHeap.pop();
+        let node = openHeap.pop();
         openDataMap.delete(hash(node.data));
         if (params.isEnd(node.data)) {
             // done
@@ -52,16 +50,16 @@ function aStar(params) {
         }
         // not done yet
         closedDataSet.add(hash(node.data));
-        var neighbors = params.neighbor(node.data);
-        for (var i = 0; i < neighbors.length; i++) {
-            var neighborData = neighbors[i];
-            if (closedDataSet.contains(hash(neighborData))) {
+        let neighbors = params.neighbor(node.data);
+        for (let i = 0; i < neighbors.length; i++) {
+            let neighborData = neighbors[i];
+            if (closedDataSet.has(hash(neighborData))) {
                 // skip closed neighbors
                 continue;
             }
-            var gFromThisNode = node.g + params.distance(node.data, neighborData);
-            var neighborNode = openDataMap.get(hash(neighborData));
-            var update = false;
+            let gFromThisNode = node.g + params.distance(node.data, neighborData);
+            let neighborNode = openDataMap.get(hash(neighborData));
+            let update = false;
             if (neighborNode === undefined) {
                 // add neighbor to the open set
                 neighborNode = {
@@ -83,9 +81,7 @@ function aStar(params) {
             neighborNode.h = params.heuristic(neighborData);
             neighborNode.f = gFromThisNode + neighborNode.h;
             if (neighborNode.h < bestNode.h) bestNode = neighborNode;
-            if (update) {
-                openHeap.heapify();
-            } else {
+            if (!update) {
                 openHeap.push(neighborNode);
             }
         }
@@ -106,22 +102,22 @@ function AsyncAStar(params) {
     assert.ok(params.heuristic);
     if (params.timeout === undefined) params.timeout = Infinity;
     assert.ok(!isNaN(params.timeout));
-    var hash = params.hash || defaultHash;
+    const hash = params.hash || defaultHash;
 
-    var startNode = {
+    let startNode = {
         data: params.start,
         g: 0,
         h: params.heuristic(params.start),
     };
-    var bestNode = startNode;
+    let bestNode = startNode;
     startNode.f = startNode.h;
     // leave .parent undefined
-    var closedDataSet = new StringSet();
-    var openHeap = new Heap(heapComparator);
-    var openDataMap = dict();
+    const closedDataSet = new Set();
+    const openHeap = new Heap(heapComparator);
+    const openDataMap = new Map();
     openHeap.push(startNode);
     openDataMap.set(hash(startNode.data), startNode);
-    var startTime = new Date();
+    const startTime = new Date();
 
     return new Observable(function (resolve, reject) {
         function pop() {
@@ -130,12 +126,12 @@ function AsyncAStar(params) {
                     status: "noPath",
                     cost: bestNode.g,
                     path: reconstructPath(bestNode),
-                })
+                });
                 return resolve.complete();
             }
 
             if (new Date() - startTime > params.timeout) {
-                console.log("timeout")
+                console.log("timeout");
                 resolve.next({
                     status: 'timeout',
                     cost: bestNode.g,
@@ -144,7 +140,7 @@ function AsyncAStar(params) {
                 return resolve.complete();
 
             }
-            var node = openHeap.pop();
+            let node = openHeap.pop();
             openDataMap.delete(hash(node.data));
             if (params.isEnd(node.data)) {
                 // done
@@ -157,16 +153,16 @@ function AsyncAStar(params) {
             }
             // not done yet
             closedDataSet.add(hash(node.data));
-            var neighbors = params.neighbor(node.data);
-            for (var i = 0; i < neighbors.length; i++) {
-                var neighborData = neighbors[i];
-                if (closedDataSet.contains(hash(neighborData))) {
+            let neighbors = params.neighbor(node.data);
+            for (let i = 0; i < neighbors.length; i++) {
+                let neighborData = neighbors[i];
+                if (closedDataSet.has(hash(neighborData))) {
                     // skip closed neighbors
                     continue;
                 }
-                var gFromThisNode = node.g + params.distance(node.data, neighborData);
-                var neighborNode = openDataMap.get(hash(neighborData));
-                var update = false;
+                let gFromThisNode = node.g + params.distance(node.data, neighborData);
+                let neighborNode = openDataMap.get(hash(neighborData));
+                let update = false;
                 if (neighborNode === undefined) {
                     // add neighbor to the open set
                     neighborNode = {
@@ -188,11 +184,7 @@ function AsyncAStar(params) {
                 neighborNode.h = params.heuristic(neighborData);
                 neighborNode.f = gFromThisNode + neighborNode.h;
                 if (neighborNode.h < bestNode.h) bestNode = neighborNode;
-                if (update) {
-                    openHeap.heapify();
-                } else {
-                    openHeap.push(neighborNode);
-                }
+                if (!update) openHeap.push(neighborNode);
             }
             process.nextTick(() => pop());
         }
@@ -204,7 +196,7 @@ function AsyncAStar(params) {
 
 function reconstructPath(node) {
     if (node.parent !== undefined) {
-        var pathSoFar = reconstructPath(node.parent);
+        let pathSoFar = reconstructPath(node.parent);
         pathSoFar.push(node.data);
         return pathSoFar;
     } else {

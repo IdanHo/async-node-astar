@@ -10,9 +10,7 @@
   "author": "IdanHo",
   "license": "BSD",
   "dependencies": {
-    "Set": "^0.4.1",
-    "dict": "^1.4.0",
-    "heap": "^0.2.3",
-    "rxjs": "^6.4.0"
+    "heap-js": "^1.4.1",
+    "rxjs": "^6.5.4"
   }
 }
