@@ -119,7 +119,7 @@ function AsyncAStar(params) {
     openDataMap.set(hash(startNode.data), startNode);
     const startTime = new Date();
 
-    return new Observable(function (resolve, reject) {
+    return new Observable(function (resolve) {
         function pop() {
             if (openHeap.size() === 0) {
                 resolve.next({
