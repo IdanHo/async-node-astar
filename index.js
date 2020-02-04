@@ -1,5 +1,5 @@
 const assert = require('assert');
-const Heap = require('heap-js');
+const { Heap } = require('heap-js');
 
 module.exports = {};
 module.exports.syncAStar = aStar;
