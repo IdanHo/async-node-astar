@@ -129,7 +129,6 @@ function AsyncAStar(params) {
             }
 
             if (new Date() - startTime > params.timeout) {
-                console.log("timeout");
                 return resolve({
                     status: 'timeout',
                     cost: bestNode.g,
